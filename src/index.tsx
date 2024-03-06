@@ -1,5 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
+export * from './BluetoothConnector';
+
 const LINKING_ERROR =
   `The package 'ongo-react-native' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -16,7 +18,3 @@ const OngoReactNative = NativeModules.OngoReactNative
         },
       }
     );
-
-export function multiply(a: number, b: number): Promise<number> {
-  return OngoReactNative.multiply(a, b);
-}

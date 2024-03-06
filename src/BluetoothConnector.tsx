@@ -237,7 +237,7 @@ const useBluetoothConnector = (
   const handleDisconnectedPeripheral = useCallback(
     (event: { peripheral: Peripheral }) => {
       isConnected.current = false;
-      connectedDeviceName.current = false;
+      connectedDeviceName.current = undefined;
       onStateChanged?.({ status: 'disconnected' });
     },
     [onStateChanged]

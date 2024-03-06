@@ -11,11 +11,13 @@ npm install ongo-react-native
 ## Usage
 
 ```js
-import { multiply } from 'ongo-react-native';
+import { useBluetoothConnector } from 'ongo-react-native';
 
 // ...
 
-const result = await multiply(3, 7);
+useBluetoothConnector({ unit: 'kg' }, (weight: number) => {
+  // handle weight result
+});
 ```
 
 ## Contributing
