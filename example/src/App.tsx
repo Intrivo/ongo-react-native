@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
 import { multiply } from 'ongo-react-native';
+import useBluetoothConnector from '../../src/BluetoothConnector';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
@@ -9,6 +10,10 @@ export default function App() {
   React.useEffect(() => {
     multiply(3, 7).then(setResult);
   }, []);
+
+  useBluetoothConnector({ unit: 'kg' }, (weight: number) => {
+    setResult(weight);
+  });
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,6 @@
 {
   "name": "ongo-react-native",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "On/Go react native sdk",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -41,14 +41,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Intrivo/ongo-mobile.git.git"
+    "url": "https://github.com/Intrivo/ongo-react-native.git"
   },
   "author": "Intrivo Diagnostics <wouyang@intrivo.com> (https://www.letsongo.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Intrivo/ongo-mobile.git/issues"
+    "url": "https://github.com/Intrivo/ongo-react-native/issues"
   },
-  "homepage": "https://github.com/Intrivo/ongo-mobile.git#readme",
+  "homepage": "https://github.com/Intrivo/ongo-react-native",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -68,32 +68,26 @@
     "prettier": "^3.0.3",
     "react": "18.2.0",
     "react-native": "0.73.5",
+    "react-native-ble-manager": "^11.3.2",
     "react-native-builder-bob": "^0.23.2",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.2.2"
+    "typescript": "~5.1.0"
   },
   "resolutions": {
     "@types/react": "^18.2.44"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-ble-manager": "11.x.x"
   },
-  "workspaces": [
-    "example"
-  ],
   "packageManager": "yarn@3.6.1",
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
     ]
   },
   "release-it": {
@@ -129,6 +123,9 @@
           "trailingComma": "es5",
           "useTabs": false
         }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "warn"
       ]
     }
   },

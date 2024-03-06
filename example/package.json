@@ -10,8 +10,10 @@
     "build:ios": "cd ios && xcodebuild -workspace OngoReactNativeExample.xcworkspace -scheme OngoReactNativeExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
   },
   "dependencies": {
+    "ongo-react-native": "file:../",
     "react": "18.2.0",
-    "react-native": "0.73.5"
+    "react-native": "0.73.5",
+    "react-native-ble-manager": "^11.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
