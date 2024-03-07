@@ -78,17 +78,13 @@ const handleAndroidPermissions = async () => {
 //   await sendZoomEventsAPI(data);
 // };
 
-const useBluetoothConnector = (
-  params: { unit: string; deviceNames?: string[] },
+const useWeightScale = (
+  params: { unit: string },
   onMeasured: (_w: number) => void,
-  onStateChanged?: (state: any) => void,
   onError?: (error: any) => void
 ) => {
   const [isBleInitialized, setIsBleInitialized] = useState(false);
   // const [isBleEnabled, setIsBleEnabled] = useState(false);
-  const isConnecting = useRef(false);
-  const isConnected = useRef(false);
-  const connectedDeviceName = useRef<string | undefined>();
   const dataPosted = useRef(false);
   const lastScannedTs = useRef(0);
 
@@ -166,6 +162,98 @@ const useBluetoothConnector = (
     },
     [dataPosted, onMeasured, params.unit]
   );
+
+  const scan = useCallback(
+    async (timeout = 60) => {
+      if (Platform.OS === 'android' && Platform.Version >= 31) {
+        const permissionResult = await handleAndroidPermissions();
+        if (!permissionResult) {
+          onError?.({ reason: 'permission_denied' });
+          return;
+        }
+      }
+      bleManagerEmitter.addListener(
+        'BleManagerDiscoverPeripheral',
+        handleDiscoverPeripheral
+      );
+      BleManager.scan([], timeout, false, {
+        matchMode: BleScanMatchMode.Sticky,
+        scanMode: BleScanMode.LowLatency,
+        callbackType: BleScanCallbackType.AllMatches,
+      })
+        .then(() => {
+          // sendEvent('scan_started');
+          console.debug('[startScan] scan promise returned successfully.');
+        })
+        .catch((err: any) => {
+          onError?.(err);
+          console.error('[startScan] ble scan returned in error', err);
+        });
+    },
+    [handleDiscoverPeripheral, onError]
+  );
+
+  const stopScan = useCallback(() => {
+    console.log('stop scan');
+    bleManagerEmitter.removeAllListeners('BleManagerDiscoverPeripheral');
+    bleManagerEmitter.removeAllListeners('BleManagerDisconnectPeripheral');
+    bleManagerEmitter.removeAllListeners(
+      'BleManagerDidUpdateValueForCharacteristic'
+    );
+    BleManager.stopScan().then(() => {
+      setIsBleInitialized(false);
+      console.log('scan stopped');
+      // sendEvent('scan_stopped');
+    });
+  }, []);
+
+  useEffect(() => {
+    try {
+      BleManager.start({ showAlert: false })
+        .then(() => {
+          setIsBleInitialized(true);
+          console.debug('BleManager started.');
+        })
+        .catch((error: any) => {
+          setIsBleInitialized(false);
+          console.error('BeManager could not be started.', error);
+        });
+    } catch (error) {
+      setIsBleInitialized(false);
+      console.error('unexpected error starting BleManager.', error);
+    }
+
+    return () => {
+      stopScan();
+    };
+  }, [stopScan]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isBleInitialized) {
+        if (new Date().getTime() - lastScannedTs.current > 5000) {
+          scan();
+        }
+      }
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isBleInitialized, scan]);
+};
+
+const useThermometer = (
+  params: { unit: string; deviceNames?: string[] },
+  onMeasured: (_w: number) => void,
+  onStateChanged?: (state: any) => void,
+  onError?: (error: any) => void
+) => {
+  const [isBleInitialized, setIsBleInitialized] = useState(false);
+  // const [isBleEnabled, setIsBleEnabled] = useState(false);
+  const isConnecting = useRef(false);
+  const isConnected = useRef(false);
+  const connectedDeviceName = useRef<string | undefined>();
+  const dataPosted = useRef(false);
+  const lastScannedTs = useRef(0);
 
   const connectDevice = useCallback(
     async (peripheral: Peripheral) => {
@@ -323,10 +411,6 @@ const useBluetoothConnector = (
       }
       bleManagerEmitter.addListener(
         'BleManagerDiscoverPeripheral',
-        handleDiscoverPeripheral
-      );
-      bleManagerEmitter.addListener(
-        'BleManagerDiscoverPeripheral',
         addOrUpdatePeripheral
       );
       bleManagerEmitter.addListener(
@@ -354,7 +438,6 @@ const useBluetoothConnector = (
     [
       addOrUpdatePeripheral,
       handleDisconnectedPeripheral,
-      handleDiscoverPeripheral,
       handleUpdateValueForCharacteristic,
       onError,
     ]
@@ -405,7 +488,7 @@ const useBluetoothConnector = (
     return () => {
       clearInterval(interval);
     };
-  }, [handleDiscoverPeripheral, isBleInitialized, scan]);
+  }, [isBleInitialized, scan]);
 };
 
-export default useBluetoothConnector;
+export { useWeightScale, useThermometer };

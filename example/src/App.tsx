@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import useBluetoothConnector from '../../src/BluetoothConnector';
+import { useWeightScale } from '../../src/BluetoothConnector';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
@@ -10,7 +10,7 @@ export default function App() {
     setResult(0);
   }, []);
 
-  useBluetoothConnector({ unit: 'kg' }, (weight: number) => {
+  useWeightScale({ unit: 'kg' }, (weight: number) => {
     setResult(weight);
   });
 
