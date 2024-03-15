@@ -1,6 +1,22 @@
+import React from 'react';
 import { NativeModules, Platform } from 'react-native';
 
-export * from './BluetoothConnector';
+export * as BluetoothConnectors from './BluetoothConnector';
+
+export type ProviderProp = {
+  children: React.ReactElement | React.ReactElement[];
+  apiKey: string;
+  baseUrl: string;
+};
+
+export const ApiContext = React.createContext<{ apiKey: string; baseUrl: string }>({
+  apiKey: '',
+  baseUrl: '',
+});
+
+export function ApiProvider({ children, apiKey, baseUrl }: ProviderProp) {
+  return <ApiContext.Provider value={{ apiKey, baseUrl }}>{children}</ApiContext.Provider>;
+}
 
 const LINKING_ERROR =
   `The package 'ongo-react-native' doesn't seem to be linked. Make sure: \n\n` +

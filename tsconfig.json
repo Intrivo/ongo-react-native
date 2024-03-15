@@ -1,9 +1,8 @@
 {
+  "include": ["src"],
+  "exclude": ["node_modules/**"],
   "compilerOptions": {
-    "rootDir": ".",
-    "paths": {
-      "ongo-react-native": ["./src/index"]
-    },
+    "baseUrl": "./src",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -23,7 +22,6 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": false,
-    "target": "esnext",
-    "verbatimModuleSyntax": true
+    "target": "ES2015"
   }
 }
