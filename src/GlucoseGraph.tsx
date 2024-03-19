@@ -15,12 +15,13 @@ import { startOfHour, endOfHour } from './helpers';
 import type { HealthData } from './data/HealthMetric';
 import { FontSize, FontFamily } from './fonts';
 import ExpandableButton from './ExpandableButton';
-import TrendingUp from './assets/trending_up.svg';
-import TrendingFlat from './assets/trending_flat.svg';
-import TrendingDown from './assets/trending_down.svg';
+import TrendingUp from './assets/TrendingUp';
+import TrendingFlat from './assets/TrendingFlat';
+import TrendingDown from './assets/TrendingDown';
 import { iso8601ToFormatted } from './helpers';
 import ChartDot from './ChartDot';
 import colors from './colors';
+import { useOnGoApi } from './network';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const MARGIN = 24;
@@ -85,7 +86,13 @@ const GraphView: React.FC<{
 
   return (
     <View style={styles.chartContainer}>
-      <View style={{ margin: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View
+        style={{
+          margin: 20,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
         <View>
           <Text style={styles.cardTitle}>Glucose level</Text>
           <Text style={styles.cardDescription}>
@@ -136,13 +143,13 @@ const GraphView: React.FC<{
             />
           }
         >
-          <VictoryLegend
+          {/* <VictoryLegend
             x={50}
             y={80}
             title='optimal range'
             data={[]}
             style={{ title: { fill: colors.slateBlue, opacity: 0.5, fontSize: 12 } }}
-          />
+          /> */}
           <VictoryArea
             style={{ data: { fill: '#BBADED1A' } }}
             data={[
@@ -174,8 +181,13 @@ const GraphView: React.FC<{
           <VictoryAxis
             style={{
               axis: { opacity: 0.5, color: colors.slateBlue },
-              // @ts-expect-error TS(2322): supress
-              tickLabels: { fontSize: 10, dx: 4, dy: 18, fontFamily: FontFamily.familyBold },
+              tickLabels: {
+                fontSize: 10,
+                // @ts-expect-error TS(2322): supress
+                dx: 4,
+                dy: 18,
+                fontFamily: FontFamily.familyBold,
+              },
             }}
             tickFormat={(t) =>
               iso8601ToFormatted(t, 'h a') === '12 AM' ? iso8601ToFormatted(t, 'MMM. d') : ''
@@ -203,7 +215,10 @@ const GraphView: React.FC<{
                 opacity: 0.1,
               },
             }}
-            data={gcmData.map(({ metric, createdAt }) => ({ x: new Date(createdAt), y: metric }))}
+            data={gcmData.map(({ metric, createdAt }) => ({
+              x: new Date(createdAt),
+              y: metric,
+            }))}
             interpolation='linear'
             standalone={false}
           />
@@ -211,7 +226,10 @@ const GraphView: React.FC<{
             // @ts-expect-error TS(2739): supress
             dataComponent={<ChartDot chartHeight={210} />}
             data={gcmData
-              .map(({ metric, createdAt }) => ({ x: new Date(createdAt), y: metric }))
+              .map(({ metric, createdAt }) => ({
+                x: new Date(createdAt),
+                y: metric,
+              }))
               .slice(-1)}
             standalone={false}
           />
@@ -224,41 +242,53 @@ const GraphView: React.FC<{
 const POLLING_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
 const GlucoseGraph: React.FC = () => {
-  return null;
-  // useEffect(() => {
-  //   dispatch(getUserHealthData(HEALTH_METRICS.GLUCOSE));
-  //   // poll CGM data every 2 minutes
-  //   const interval = setInterval(() => {
-  //     dispatch(getUserHealthData(HEALTH_METRICS.GLUCOSE));
-  //   }, POLLING_INTERVAL);
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
+  const [gcmData, setGcmData] = useState<HealthData[]>();
+  const api = useOnGoApi();
 
-  // const metrics = getMetrics(gcmData);
-  // const sortedData = gcmData
-  //   .map(({ createdAt, metric }) => ({ createdAt, metric: Number(metric) }))
-  //   .filter(({ metric }) => metric >= 40 && metric <= 400)
-  //   // .filter(({ createdAt }) => {
-  //   //   if ((new Date(createdAt).getTime() / 1000) % 5 === 0) {
-  //   //     console.log('remove', createdAt);
-  //   //     return false;
-  //   //   }
-  //   //   return true;
-  //   // })
-  //   .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  // const dates = sortedData.map(({ createdAt }) => new Date(createdAt));
+  useEffect(() => {
+    if (gcmData) return;
+    const fetchHealthMetric = async () => {
+      const response = await api.get(
+        '/users/000067de-f0a5-4dc4-bafd-b4f00392bdda/user_health_metrics',
+        {
+          params: { 'filter[name]': 'blood_glucose', per_page: 500 },
+        }
+      );
+      const healthMetric = response.data.data.map((d: { value: string; created_at: string }) => ({
+        metric: Number(d.value),
+        createdAt: d.created_at,
+      }));
+      setGcmData(healthMetric);
+    };
+    fetchHealthMetric();
+  }, [api, gcmData]);
 
-  // return gcmData.length === 0 ? null : (
-  //   <>
-  //     <Text style={styles.title}>Monitoring</Text>
-  //     <View style={styles.container}>
-  //       <GraphView
-  //         gcmData={sortedData}
-  //         dateRange={{ start: dates[0], end: dates[dates.length - 1] }}
-  //       />
-  //     </View>
-  //   </>
-  // );
+  if (!gcmData) return null;
+
+  console.log('render gcm');
+
+  const metrics = getMetrics(gcmData);
+  const sortedData = gcmData
+    .map(({ createdAt, metric }) => ({ createdAt, metric: Number(metric) }))
+    .filter(({ metric }) => metric >= 40 && metric <= 400)
+    // .filter(({ createdAt }) => {
+    //   if ((new Date(createdAt).getTime() / 1000) % 5 === 0) {
+    //     console.log('remove', createdAt);
+    //     return false;
+    //   }
+    //   return true;
+    // })
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const dates = sortedData.map(({ createdAt }) => new Date(createdAt));
+
+  return gcmData.length === 0 ? null : (
+    <View style={styles.container}>
+      <GraphView
+        gcmData={sortedData}
+        dateRange={{ start: dates[0], end: dates[dates.length - 1] }}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

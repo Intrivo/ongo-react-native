@@ -1,21 +1,31 @@
 import React from 'react';
 import { NativeModules, Platform } from 'react-native';
 
-export * as BluetoothConnectors from './BluetoothConnector';
+import * as BluetoothConnectors from './BluetoothConnector';
+import GlucoseGraph from './GlucoseGraph';
+export { BluetoothConnectors, GlucoseGraph };
 
 export type ProviderProp = {
-  children: React.ReactElement | React.ReactElement[];
   apiKey: string;
   baseUrl: string;
+  accessToken: string;
 };
 
-export const ApiContext = React.createContext<{ apiKey: string; baseUrl: string }>({
+export const ApiContext = React.createContext<ProviderProp>({
   apiKey: '',
   baseUrl: '',
+  accessToken: '',
 });
 
-export function ApiProvider({ children, apiKey, baseUrl }: ProviderProp) {
-  return <ApiContext.Provider value={{ apiKey, baseUrl }}>{children}</ApiContext.Provider>;
+export function ApiProvider({
+  children,
+  apiKey,
+  baseUrl,
+  accessToken,
+}: ProviderProp & { children: React.ReactElement | React.ReactElement[] }) {
+  return (
+    <ApiContext.Provider value={{ apiKey, baseUrl, accessToken }}>{children}</ApiContext.Provider>
+  );
 }
 
 const LINKING_ERROR =

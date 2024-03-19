@@ -17,24 +17,25 @@ const createAxiosInstance = (apiKey: string, baseUrl: string) =>
     baseURL: `${baseUrl}/api/v2`,
     headers: {
       common: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        'x-app-version': 'ongo-sdk/1.0.0',
+        'x-app-version': 'ongo-android/1.0.0-100',
         'Accept-Language': 'en',
       },
     },
     timeout: 10000,
   });
 
-const useOnGoApi = (accessToken: string) => {
+const useOnGoApi = () => {
   const context = useContext(ApiContext);
   const axiosInstance = createAxiosInstance(context.apiKey, context.baseUrl);
   axiosInstance.interceptors.request.use((config) => {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+    config.headers.Authorization = `Bearer ${context.accessToken}`;
     return config;
   });
   axiosInstance.interceptors.request.use(paramsInterceptor);
+  return axiosInstance;
 };
 
 export { useOnGoApi };

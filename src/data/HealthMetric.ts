@@ -1,4 +1,4 @@
 export interface HealthData {
-  metric: string;
+  metric: number;
   createdAt: string;
 }

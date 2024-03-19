@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable } from 'react-native';
-import ArrowUp from './assets/arrow_up.svg';
-import ArrowDown from './assets/arrow_down.svg';
+import ArrowUp from './assets/ArrowUp';
+import ArrowDown from './assets/ArrowDown.js';
 
 const ExpandableButton = ({
   isExpanded,
