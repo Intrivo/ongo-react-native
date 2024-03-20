@@ -223,8 +223,7 @@ const GraphView: React.FC<{
             standalone={false}
           />
           <VictoryScatter
-            // @ts-expect-error TS(2739): supress
-            dataComponent={<ChartDot chartHeight={210} />}
+            dataComponent={<ChartDot />}
             data={gcmData
               .map(({ metric, createdAt }) => ({
                 x: new Date(createdAt),
@@ -248,12 +247,11 @@ const GlucoseGraph: React.FC = () => {
   useEffect(() => {
     if (gcmData) return;
     const fetchHealthMetric = async () => {
-      const response = await api.get(
-        '/users/000067de-f0a5-4dc4-bafd-b4f00392bdda/user_health_metrics',
-        {
-          params: { 'filter[name]': 'blood_glucose', per_page: 500 },
-        }
-      );
+      const res = await api.get('/me');
+      const userId = res.data.data.id;
+      const response = await api.get(`/users/${userId}/user_health_metrics`, {
+        params: { 'filter[name]': 'blood_glucose', 'per_page': 500 },
+      });
       const healthMetric = response.data.data.map((d: { value: string; created_at: string }) => ({
         metric: Number(d.value),
         createdAt: d.created_at,

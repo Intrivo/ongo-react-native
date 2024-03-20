@@ -17,7 +17,7 @@ const createAxiosInstance = (apiKey: string, baseUrl: string) =>
     baseURL: `${baseUrl}/api/v2`,
     headers: {
       common: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'x-app-version': 'ongo-android/1.0.0-100',

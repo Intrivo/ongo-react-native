@@ -3,24 +3,19 @@ import { StyleSheet, View } from 'react-native';
 import colors from './colors';
 
 export interface Position {
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
 }
 
 export interface DotProps extends Position {
-  visible: boolean;
-  chartHeight: number;
-  index: number;
+  index?: number;
 }
 
 export interface BarProps extends Position {
   height: number;
 }
 
-const ChartDot = ({ x, y, chartHeight, index }: DotProps) => {
-  const yWithBottomPadding = y + 20;
-  const barHeight = chartHeight - yWithBottomPadding;
-
+const ChartDot = ({ x, y, index }: DotProps) => {
   return index === 0 ? (
     <>
       <View style={[styles.outerDotContainer, { top: y - 10, left: x - 10 }]}>

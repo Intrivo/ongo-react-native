@@ -3,7 +3,8 @@ import { NativeModules, Platform } from 'react-native';
 
 import * as BluetoothConnectors from './BluetoothConnector';
 import GlucoseGraph from './GlucoseGraph';
-export { BluetoothConnectors, GlucoseGraph };
+import WeightGraph from './WeightGraph';
+export { BluetoothConnectors, GlucoseGraph, WeightGraph };
 
 export type ProviderProp = {
   apiKey: string;

@@ -4,6 +4,8 @@ const colors = {
   greyGrey: '#999999',
   greyMidnight: '#292929',
   slateBlue: '#5633D3',
+  lightGreen: '#49C37C',
+  statusRed: '#EB5757',
   primaryPavement: '#F2F7F9',
   transparentBlue: 'rgba(42, 77, 155, 0.1)',
   transparentBlue2: 'rgba(42, 77, 155, 0)',

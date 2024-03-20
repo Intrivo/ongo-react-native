@@ -8,6 +8,10 @@ export const endOfHour = (date: Date) => {
   return new Date(Math.ceil(date.getTime() / 3600 / 1000) * 3600 * 1000);
 };
 
+export const getDifferenceInDays = (from: Date, to: Date) => {
+  return DateFns.differenceInDays(from, to);
+};
+
 export const camelCaseToSnakeCase = (key: string) =>
   key.replace(/[A-Z]+/g, (substring) => `_${substring.toLowerCase()}`);
 
